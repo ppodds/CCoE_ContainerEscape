@@ -1,0 +1,4 @@
+FROM vulnerables/web-dvwa
+
+RUN chmod 777 ./
+RUN apt-get update

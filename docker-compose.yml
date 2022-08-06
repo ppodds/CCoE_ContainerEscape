@@ -1,0 +1,60 @@
+version: '3.7'
+services: 
+  dvwa:
+    build:
+      context: ./docker-compose/DVWA
+      dockerfile: Dockerfile.dvwa
+    container_name: dvwa_container
+    restart: unless-stopped
+    ports:
+      - '8090:80'
+    environment:
+      TZ: Asia/Taipei
+    # pid: "host"
+    # volumes:
+    #   - ./docker-compose/DVWA/var/log:/var/log/
+    networks:
+      - safe_network
+    
+  nginx:
+    image: nginx:1.21.6-alpine
+    container_name: ccoe_nginx
+    restart: unless-stopped
+    ports:
+      - '8095:80'
+    volumes:
+      - ./docker-compose/nginx/nginx_log:/var/log/nginx
+    environment:
+      TZ: Asia/Taipei
+    networks:
+      - safe_network
+    
+  falco:
+    build:
+      context: ./docker-compose/falco_test
+      dockerfile: Dockerfile.falco
+    container_name: falco_container
+    restart: unless-stopped
+    privileged: true
+    volumes:
+      - /var/run/docker.sock:/host/var/run/docker.sock
+      - /dev:/host/dev
+      - /proc:/host/proc:ro
+      - /boot:/host/boot:ro
+      - /lib/modules:/host/lib/modules:ro
+      - /usr:/host/usr:ro
+      - /etc:/host/etc:ro
+    environment:
+      TZ: Asia/Taipei
+    ports:
+      - '8096:8765'
+    networks:
+      - safe_network
+    depends_on:
+      - dvwa
+      - nginx
+
+networks:
+  safe_network:
+    driver: bridge
+  
