@@ -11,8 +11,10 @@ services:
     environment:
       TZ: Asia/Taipei
     # pid: "host"
-    # volumes:
-    #   - ./docker-compose/DVWA/var/log:/var/log/
+    volumes: #掛載以下資料夾，用來更改dvwa頁面的各種權限，主要是將php.ini加入版控
+      - ./docker-compose/DVWA/var/www:/var/www
+      - ./docker-compose/DVWA/etc/php:/etc/php
+      - ./docker-compose/DVWA/etc/php5:/etc/php5
     networks:
       - safe_network
     
@@ -23,38 +25,61 @@ services:
     ports:
       - '8095:80'
     volumes:
+      # - ./docker-compose/nginx:/etc/nginx/conf.d:ro
       - ./docker-compose/nginx/nginx_log:/var/log/nginx
     environment:
       TZ: Asia/Taipei
     networks:
       - safe_network
+
+  # falco_driver_loader:
+  #   image: falcosecurity/falco-driver-loader:0.31.1
+  #   container_name: falco_driver_loader
+  #   privileged: true
+  #   restart: on-failure
+  #   volumes:
+  #     - /root/.falco:/root/.falco
+  #     - /proc:/host/proc:ro
+  #     - /boot:/host/boot:ro
+  #     - /lib/modules:/host/lib/modules
+  #     - /usr:/host/usr:ro
+  #     - /etc:/host/etc:ro
+  #   environment:
+  #     TZ: Asia/Taipei
     
-  falco:
-    build:
-      context: ./docker-compose/falco_test
-      dockerfile: Dockerfile.falco
-    container_name: falco_container
-    restart: unless-stopped
-    privileged: true
-    volumes:
-      - /var/run/docker.sock:/host/var/run/docker.sock
-      - /dev:/host/dev
-      - /proc:/host/proc:ro
-      - /boot:/host/boot:ro
-      - /lib/modules:/host/lib/modules:ro
-      - /usr:/host/usr:ro
-      - /etc:/host/etc:ro
-    environment:
-      TZ: Asia/Taipei
-    ports:
-      - '8096:8765'
-    networks:
-      - safe_network
-    depends_on:
-      - dvwa
-      - nginx
+  # falco:
+  #   build:
+  #     context: ./docker-compose/falco_test
+  #     dockerfile: Dockerfile.falco
+  #   container_name: falco_container
+  #   restart: unless-stopped
+  #   privileged: true
+  #   volumes:
+  #     - /var/run/docker.sock:/host/var/run/docker.sock
+  #     - /dev:/host/dev
+  #     - /proc:/host/proc:ro
+  #     - /boot:/host/boot:ro
+  #     - /lib/modules:/host/lib/modules:ro
+  #     - /usr:/host/usr:ro
+  #     - /etc:/host/etc:ro
+  #   environment:
+  #     TZ: Asia/Taipei
+  #   ports:
+  #     - '8096:8765'
+  #   networks:
+  #     - safe_network
+  #   depends_on:
+  #     - dvwa
+  #     - nginx
 
 networks:
   safe_network:
     driver: bridge
   
+
+# volumes:
+#   dvwa-var-www:
+#     name: dvwa-var-www
+  
+#   dvwa-etc:
+#     name: dvwa-etc
