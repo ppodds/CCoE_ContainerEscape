@@ -32,52 +32,42 @@ services:
     networks:
       - safe_network
 
-  # falco_driver_loader:
-  #   image: falcosecurity/falco-driver-loader:0.31.1
-  #   container_name: falco_driver_loader
-  #   privileged: true
-  #   restart: on-failure
-  #   volumes:
-  #     - /root/.falco:/root/.falco
-  #     - /proc:/host/proc:ro
-  #     - /boot:/host/boot:ro
-  #     - /lib/modules:/host/lib/modules
-  #     - /usr:/host/usr:ro
-  #     - /etc:/host/etc:ro
-  #   environment:
-  #     TZ: Asia/Taipei
+
     
-  # falco:
-  #   build:
-  #     context: ./docker-compose/falco_test
-  #     dockerfile: Dockerfile.falco
-  #   container_name: falco_container
-  #   restart: unless-stopped
-  #   privileged: true
-  #   volumes:
-  #     - /var/run/docker.sock:/host/var/run/docker.sock
-  #     - /dev:/host/dev
-  #     - /proc:/host/proc:ro
-  #     - /boot:/host/boot:ro
-  #     - /lib/modules:/host/lib/modules:ro
-  #     - /usr:/host/usr:ro
-  #     - /etc:/host/etc:ro
-  #   environment:
-  #     TZ: Asia/Taipei
-  #   ports:
-  #     - '8096:8765'
-  #   networks:
-  #     - safe_network
-  #   depends_on:
-  #     - dvwa
-  #     - nginx
+  falco:
+    build:
+      context: ./docker-compose/falco_test
+      dockerfile: Dockerfile.falco
+    container_name: falco_monitor
+    restart: unless-stopped
+    privileged: true
+    volumes:
+      - /var/run/docker.sock:/host/var/run/docker.sock
+      - /dev:/host/dev
+      - /proc:/host/proc:ro
+      - /boot:/host/boot:ro
+      - /lib/modules:/host/lib/modules:ro
+      - /usr:/host/usr:ro
+      - /etc:/host/etc:ro
+      - ./docker-compose/falco/falco_mount:/etc/falco:ro
+    environment:
+      TZ: Asia/Taipei
+    # ports:
+      # - '8096:8765'
+    networks:
+      - safe_network
+    depends_on:
+      - dvwa
+      - nginx
 
 networks:
   safe_network:
     driver: bridge
   
 
-# volumes:
+volumes:
+  falco-rules:
+    name: falco-rules
 #   dvwa-var-www:
 #     name: dvwa-var-www
   
