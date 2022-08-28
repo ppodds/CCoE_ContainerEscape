@@ -1,8 +1,9 @@
 .DEFAULT_GOAL=build
 
+# 啟動所有container
 up:
-	docker-compose up -d --build
-
+	docker-compose --env-file .docker-compose.env up -d --build
+# 關閉所有container
 down:
 	docker-compose down
 

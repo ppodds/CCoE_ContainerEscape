@@ -31,7 +31,7 @@
 
 - rule: syscall_in_container
   desc: notice all syscall within a container
-  condition: evt.type = execve and evt.dir=< and container.name=dvwa_container
-  output: syscall in a container (user=%user.name evt.type=%evt.type syscall.type=%syscall.type command=%proc.cmdline process_name=%proc.name file=%fd.name )
-  priority: ERROR
+  condition: container and (container.id exists and container.name != falco_monitor) and proc_name_exists and proc.name != gnome-shell
+  output: "(container=%container.info syscall=%syscall.type process=%proc.name)"
+  priority: notice
   tags: [users,container]
