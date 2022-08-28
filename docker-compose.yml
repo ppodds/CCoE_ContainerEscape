@@ -1,43 +1,7 @@
 version: '3.7'
-services: 
-  dvwa:
-    build:
-      context: ./docker-compose/DVWA
-      dockerfile: Dockerfile.dvwa
-    container_name: dvwa_container
-    restart: unless-stopped
-    ports:
-      - '8090:80'
-    environment:
-      TZ: Asia/Taipei
-    # pid: "host"
-    volumes: #掛載以下資料夾，用來更改dvwa頁面的各種權限，主要是將php.ini加入版控
-      - ./docker-compose/DVWA/var/www:/var/www
-      - ./docker-compose/DVWA/etc/php:/etc/php
-      - ./docker-compose/DVWA/etc/php5:/etc/php5
-    networks:
-      - safe_network
-    
-  nginx:
-    image: nginx:1.21.6-alpine
-    container_name: ccoe_nginx
-    restart: unless-stopped
-    ports:
-      - '8095:80'
-    volumes:
-      # - ./docker-compose/nginx:/etc/nginx/conf.d:ro
-      - ./docker-compose/nginx/nginx_log:/var/log/nginx
-    environment:
-      TZ: Asia/Taipei
-    networks:
-      - safe_network
-
-
-    
-  falco:
-    build:
-      context: ./docker-compose/falco_test
-      dockerfile: Dockerfile.falco
+services:     
+  falco: #falco_monitor
+    image: falcosecurity/falco:0.31.1
     container_name: falco_monitor
     restart: unless-stopped
     privileged: true
@@ -52,24 +16,80 @@ services:
       - ./docker-compose/falco/falco_mount:/etc/falco:ro
     environment:
       TZ: Asia/Taipei
-    # ports:
-      # - '8096:8765'
+    networks:
+      - safe_network
+
+
+  target_machine: #靶機
+    build:
+      context: ./docker-compose/ubuntu_1804
+      dockerfile: Dockerfile
+    container_name: ubuntu_1804
+    restart: unless-stopped
+    tty: true
+    ports:
+      - '8090:80'
+    environment:
+      TZ: Asia/Taipei
+
+
+  db: #存放falco logs的db
+    image: postgres:12
+    container_name: falco_logs_db
+    restart: unless-stopped
+    tty: true
+    environment:
+      POSTGRES_USER: ${POSTGRESQL_USER:-user}
+      POSTGRES_PASSWORD: ${POSTGRESQL_PASSWORD}
+      TZ: Asia/Taipei
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./docker-compose/db/init.d:/docker-entrypoint-initdb.d
+      - ./docker-compose/db/update-db-scripts/:/update-db-script/ #要對db進行操作就寫scripts並進去container裡面運行
+    networks:
+      - safe_network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: ccoe-pgadmin
+    restart: unless-stopped
+    ports:
+      - 8095:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+    volumes:
+      - ccoe-pgadmin:/var/lib/pgadmin
     networks:
       - safe_network
     depends_on:
-      - dvwa
-      - nginx
+      - db
 
+  falco_python:
+    build:
+      context: ./docker-compose/falco_python
+      dockerfile: Dockerfile.falco_python
+    container_name: falco_python
+    tty: true
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Taipei
+    working_dir: /app/
+    volumes:
+      - ./docker-compose/falco_python:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - safe_network
+    ports:
+      - '8092:5000'
+    
 networks:
   safe_network:
     driver: bridge
   
-
 volumes:
-  falco-rules:
-    name: falco-rules
-#   dvwa-var-www:
-#     name: dvwa-var-www
-  
-#   dvwa-etc:
-#     name: dvwa-etc
+  db-data:
+    name: db-data
+  ccoe-pgadmin:
+    name: ccoe-pgadmin
+

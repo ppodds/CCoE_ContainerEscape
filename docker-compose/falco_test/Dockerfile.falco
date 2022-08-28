@@ -1,3 +1,0 @@
-FROM falcosecurity/falco:latest
-
-# ADD falco_mount /host/etc/falco/falco_mount
