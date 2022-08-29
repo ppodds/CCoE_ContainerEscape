@@ -1,5 +1,5 @@
-version: '3.7'
-services:     
+version: "3.7"
+services:
   falco: #falco_monitor
     image: falcosecurity/falco:0.31.1
     container_name: falco_monitor
@@ -19,7 +19,6 @@ services:
     networks:
       - safe_network
 
-
   target_machine: #靶機
     build:
       context: ./docker-compose/ubuntu_1804
@@ -28,10 +27,9 @@ services:
     restart: unless-stopped
     tty: true
     ports:
-      - '8090:80'
+      - "8090:80"
     environment:
       TZ: Asia/Taipei
-
 
   db: #存放falco logs的db
     image: postgres:12
@@ -74,22 +72,17 @@ services:
     restart: unless-stopped
     environment:
       TZ: Asia/Taipei
-    working_dir: /app/
-    volumes:
-      - ./docker-compose/falco_python:/app
-      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - safe_network
     ports:
-      - '8092:5000'
-    
+      - "8092:5000"
+
 networks:
   safe_network:
     driver: bridge
-  
+
 volumes:
   db-data:
     name: db-data
   ccoe-pgadmin:
     name: ccoe-pgadmin
-
