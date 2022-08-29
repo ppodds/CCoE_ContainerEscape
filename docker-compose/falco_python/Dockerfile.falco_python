@@ -7,6 +7,8 @@ RUN set -ex \
     && pip install --upgrade pip \
     && pip install -r requirements.txt
 
+COPY .env .
 COPY app.py .
+COPY app .
 
 CMD ["python", "-m", "flask", "--debug", "run", "--host=0.0.0.0"]
