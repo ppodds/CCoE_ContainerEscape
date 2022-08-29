@@ -9,4 +9,4 @@ RUN set -ex \
 
 COPY app.py .
 
-CMD ["python", "-m",  "flask", "run", "--host=0.0.0.0"]
+CMD ["python", "-m", "flask", "--debug", "run", "--host=0.0.0.0"]
