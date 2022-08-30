@@ -1,1 +1,1 @@
-from app.database.model import Log
+from app.database.model.log import Log

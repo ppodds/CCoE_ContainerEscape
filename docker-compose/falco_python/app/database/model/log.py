@@ -7,5 +7,11 @@ class Log(db.Model):
     process = db.Column(db.String(15), nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
 
+    def __init__(self, container, syscall, process, timestamp):
+        self.container = container
+        self.syscall = syscall
+        self.process = process
+        self.timestamp = timestamp
+
     def __repr__(self) -> str:
         return f'<Log {self.id} {self.container} {self.syscall} {self.process} {self.timestamp}>'

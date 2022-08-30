@@ -2,6 +2,7 @@ from decouple import config
 
 class Config:
     # PostgreSQL database
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = '{}://{}:{}@{}:{}/{}'.format(
         config('DB_ENGINE', default='postgresql'),
         config('DB_USERNAME', default='appseed'),

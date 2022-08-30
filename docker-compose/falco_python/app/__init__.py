@@ -1,11 +1,11 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from app.routes.index import blueprint
 from app.config import Config
 
 db = SQLAlchemy()
 
 def register_blueprints(app):
+    from app.routes.index import blueprint
     app.register_blueprint(blueprint)
 
 def register_extensions(app):
@@ -25,7 +25,7 @@ def configure_database(app):
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    register_blueprints(app)
     register_extensions(app)
+    register_blueprints(app)
     configure_database(app)
     return app
