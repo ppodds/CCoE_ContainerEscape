@@ -1,3 +1,5 @@
-flask
-nginxparser_eb
-docker
+flask==2.2.2
+Flask-SQLAlchemy==2.5.1
+psycopg2==2.9.3
+python-dotenv==0.20.0
+python-decouple==3.6

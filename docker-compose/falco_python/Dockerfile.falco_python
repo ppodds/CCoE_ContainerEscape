@@ -1,12 +1,14 @@
 FROM python:3.8
 
-COPY requirements.txt /app/
-
 WORKDIR /app
+COPY requirements.txt .
 
 RUN set -ex \
     && pip install --upgrade pip \
     && pip install -r requirements.txt
-    
-# 以下這個檔案得重寫 變成單純讀取falco的logs並寫進db當中
-# CMD python web.py
+
+COPY .env .
+COPY app.py .
+COPY app ./app
+
+CMD ["python", "-m", "flask", "--debug", "run", "--host=0.0.0.0"]

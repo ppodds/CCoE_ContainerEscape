@@ -33,7 +33,6 @@ rules_file:
   - /etc/falco/k8s_audit_rules.yaml
   - /etc/falco/rules.d
 
-
 #
 # Plugins that are available for use. These plugins are not loaded by
 # default, as they require explicit configuration to point to
@@ -65,7 +64,7 @@ load_plugins: []
 time_format_iso_8601: true
 
 # Whether to output events in json or text
-json_output: false
+json_output: true
 
 # When using json output, whether or not to include the "output" property
 # itself (e.g. "File below a known binary directory opened for writing
@@ -244,8 +243,8 @@ program_output:
   program: "jq '{text: .output}' | curl -d @- -X POST https://hooks.slack.com/services/XXX"
 
 http_output:
-  enabled: false
-  url: http://some.url
+  enabled: true
+  url: http://falco_python:5000
   user_agent: "falcosecurity/falco"
 
 # Falco supports running a gRPC server with two main binding types
