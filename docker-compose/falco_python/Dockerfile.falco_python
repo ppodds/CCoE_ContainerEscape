@@ -9,6 +9,6 @@ RUN set -ex \
 
 COPY .env .
 COPY app.py .
-COPY app .
+COPY app ./app
 
 CMD ["python", "-m", "flask", "--debug", "run", "--host=0.0.0.0"]
